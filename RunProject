@@ -1,0 +1,3 @@
+In Root folder where manage.py file exists:
+1 - python manage.py makemigrations
+2 - python manage.py migrate

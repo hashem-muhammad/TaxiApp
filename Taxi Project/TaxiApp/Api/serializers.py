@@ -15,7 +15,7 @@ class CustomRegisterSerializer(RegisterSerializer):
     def save(self, request):
         user = super().save(request)
         user.phone_number = self.data.get('phone_number')
-        user.birth_date = self.data.get('birth_date')
+        user.role = self.data.get('role')
         user.name = self.data.get('name')
         user.save()
         return user
@@ -43,12 +43,11 @@ class StopPointSerializer(serializers.ModelSerializer):
 
 
 class TripSerializer(serializers.ModelSerializer):
-    stop_point = StopPointSerializer(many=True)
 
     class Meta:
         model = Trip
         fields = ['id', 'start_place', 'final_place',
-                  'stop_point', 'driver', 'user_location', 'time', 'distance', 'price', ]
+                  'driver', 'time', 'distance', 'price', ]
 
 
 class DriverLocationSerializer(serializers.ModelSerializer):

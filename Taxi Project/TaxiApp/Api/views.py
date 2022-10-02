@@ -3,9 +3,14 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from rest_framework_simplejwt.views import TokenObtainPairView
 from Api.models import CarType, Driver, DriverCar, Message, Trip, TripType
-from Api.serializers import CarTypeSerializer, DriverCarSerializer, DriverSerializer, MessageSerializer, StopPointSerializer, TripSerializer, TripTypeSerializer
+from Api.serializers import CarTypeSerializer, DriverCarSerializer, DriverSerializer, MessageSerializer, StopPointSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer
+
+
+class MyObtainTokenPairView(TokenObtainPairView):
+    permission_classes = (AllowAny,)
+    serializer_class = MyTokenObtainPairSerializer
 
 
 class TripTypeView(APIView):

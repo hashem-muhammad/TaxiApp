@@ -2,20 +2,36 @@ from django.db import transaction
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
-from Api.models import CarType, Driver, DriverCar, DriverLocation, StopPoint, Trip, TripType, Message, Price, Coupon
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from Api.models import CarType, Driver, DriverCar, DriverLocation, Role, StopPoint, Trip, TripType, Message, Price, Coupon
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+
+        data['phone_number'] = self.user.phone_number
+        data['role'] = self.user.role.id
+        return data
 
 
 class CustomRegisterSerializer(RegisterSerializer):
     name = serializers.CharField(max_length=150)
     phone_number = serializers.CharField(max_length=30)
-    birth_date = serializers.DateField(required=False)
+    role = serializers.IntegerField()
 
     # Define transaction.atomic to rollback the save operation in case of error
     @transaction.atomic
     def save(self, request):
         user = super().save(request)
         user.phone_number = self.data.get('phone_number')
-        user.role = self.data.get('role')
+        get_role = Role.objects.get(id=self.data.get('role'))
+        user.role = get_role
         user.name = self.data.get('name')
         user.save()
         return user

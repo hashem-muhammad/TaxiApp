@@ -17,11 +17,8 @@ class User(AbstractUser):
     username = None
     name = models.CharField(max_length=150, null=True)
     phone_number = models.CharField(max_length=14, unique=True)
-    birth_date = models.DateField(blank=True, null=True)
     role = models.ForeignKey(
         Role, on_delete=models.SET_NULL, null=True, blank=True)
-    note = models.TextField(blank=True, null=True)
-
     objects = UserManager()
 
     def __str__(self):
@@ -60,11 +57,8 @@ class Trip(models.Model):
     id = models.AutoField(primary_key=True)
     start_place = models.CharField(max_length=255)
     final_place = models.CharField(max_length=255)
-    stop_point = models.ForeignKey(
-        StopPoint, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True)
-    user_location = models.CharField(max_length=255)
     time = models.DateTimeField()
     distance = models.FloatField()
     price = models.FloatField()

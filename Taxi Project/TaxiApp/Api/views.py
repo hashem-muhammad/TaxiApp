@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
-from Api.models import CarType, Driver, DriverCar, Message, Trip, TripType
-from Api.serializers import CarTypeSerializer, DriverCarSerializer, DriverSerializer, MessageSerializer, StopPointSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer
+from Api.models import CarType, Coupon, Driver, DriverCar, Message, Price, Trip, TripType
+from Api.serializers import CarTypeSerializer, CouponSerializer, DriverCarSerializer, DriverSerializer, MessageSerializer, PriceSerializer, StopPointSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
@@ -104,3 +104,23 @@ class MessageView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CouponView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, coupon, *args, **kwargs):
+        qs = Coupon.objects.filter(coupon=coupon)
+        serilaizer = CouponSerializer(qs, many=True)
+        return Response(serilaizer.data, status=status.HTTP_200_OK)
+
+
+class PriceView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        qs = Price.objects.all()
+        serializer = PriceSerializer(qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

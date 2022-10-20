@@ -48,7 +48,7 @@ class CarTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarType
-        fields = ['id', 'type', ]
+        fields = ['id', 'type', 'price', ]
 
 
 class StopPointSerializer(serializers.ModelSerializer):
@@ -100,4 +100,12 @@ class CouponSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Coupon
-        fields = ['id', 'fixed', 'start_date', 'end_date', ]
+        fields = ['id', 'value', 'coupon', 'start_date', 'end_date', ]
+
+
+class PriceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Price
+        fields = ['id', 'km_price', 'wait_price',
+                  'tax_price', 'extra_price', 'company_per', ]

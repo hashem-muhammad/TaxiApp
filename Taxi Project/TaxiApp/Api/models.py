@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from Api.Manager.UserManager import UserManager
@@ -36,6 +37,7 @@ class TripType(models.Model):
 class CarType(models.Model):
     id = models.AutoField(primary_key=True)
     type = models.CharField(max_length=100)
+    price = models.FloatField(default=0.0)
     trip_type = models.ForeignKey(
         TripType, on_delete=models.SET_NULL, null=True)
 
@@ -121,11 +123,11 @@ class Message(models.Model):
 
 class Price(models.Model):
     id = models.AutoField(primary_key=True)
-    km_price = models.FloatField()
-    wait_price = models.FloatField()
-    tax_price = models.FloatField()
-    extra_price = models.FloatField()
-    company_per = models.SmallIntegerField()
+    km_price = models.FloatField(default=0.0)
+    wait_price = models.FloatField(default=0.0)
+    tax_price = models.FloatField(default=0.0)
+    extra_price = models.FloatField(default=0.0)
+    company_per = models.SmallIntegerField(default=0.0)
 
     def __str__(self) -> str:
         return "{}".format(self.km_price)
@@ -133,7 +135,8 @@ class Price(models.Model):
 
 class Coupon(models.Model):
     id = models.AutoField(primary_key=True)
-    fixed = models.BooleanField()
+    value = models.FloatField(default=0.0)
+    coupon = models.CharField(max_length=60, default='')
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     active = models.BooleanField()

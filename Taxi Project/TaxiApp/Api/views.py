@@ -4,8 +4,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
-from Api.models import CarType, Coupon, Driver, DriverCar, Message, Price, Trip, TripType
-from Api.serializers import CarTypeSerializer, CouponSerializer, DriverCarSerializer, DriverSerializer, MessageSerializer, PriceSerializer, StopPointSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer
+from yaml import serialize
+from Api.models import CarType, Complain, Coupon, Driver, DriverCar, DriverReview, Message, Price, Trip, TripReview, TripType
+from Api.serializers import CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverCarSerializer, DriverReviewSerializer, DriverSerializer, MessageSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer
+from django.db.models import Q
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
@@ -20,7 +22,9 @@ class TripTypeView(APIView):
     def get(self, request, *args, **kwargs):
         qs = TripType.objects.all()
         serializer = TripTypeSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class CarTypeView(APIView):
@@ -30,7 +34,9 @@ class CarTypeView(APIView):
     def get(self, request, *args, **kwargs):
         qs = CarType.objects.all()
         serializer = CarTypeSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class StopPointView(APIView):
@@ -50,9 +56,19 @@ class TripView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get(self, request, *args, **kwargs):
-        qs = Trip.objects.all()
+        qs = Trip.objects.filter(
+            Q(user=request.user.id) | Q(driver=request.user.id))
         serializer = TripSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, *args, **kwargs):
+        serializer = TripSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DriverCarView(APIView):
@@ -62,7 +78,9 @@ class DriverCarView(APIView):
     def get(self, request, *args, **kwargs):
         qs = DriverCar.objects.filter(user=request.user)
         serializer = DriverCarSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
         serializer = DriverCarSerializer(data=request.data)
@@ -79,7 +97,9 @@ class DriverView(APIView):
     def get(self, request, *args, **kwargs):
         qs = Driver.objects.filter(user=request.user)
         serializer = DriverSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
         serializer = DriverSerializer(data=request.data)
@@ -96,7 +116,9 @@ class MessageView(APIView):
     def get(self, request, *args, **kwargs):
         qs = Message.objects.filter(user=request.user)
         serializer = MessageSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
         serializer = MessageSerializer(data=request.data)
@@ -113,7 +135,9 @@ class CouponView(APIView):
     def get(self, request, coupon, *args, **kwargs):
         qs = Coupon.objects.filter(coupon=coupon)
         serilaizer = CouponSerializer(qs, many=True)
-        return Response(serilaizer.data, status=status.HTTP_200_OK)
+        if qs.exists():
+            return Response(serilaizer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class PriceView(APIView):
@@ -123,4 +147,65 @@ class PriceView(APIView):
     def get(self, request, *args, **kwargs):
         qs = Price.objects.all()
         serializer = PriceSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class TripReviewView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        qs = TripReview.objects.filter(
+            Q(user_id=request.user) | Q(driver_id=request.user))
+        serializer = TripReviewSerializer(qs, many=True)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, *args, **kwargs):
+        serializer = TripReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DriverReviewView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        qs = DriverReview.objects.filter(
+            Q(user_id=request.user) | Q(driver_id=request.user))
+        serializer = DriverReviewSerializer(qs, many=True)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, *args, **kwargs):
+        serializer = DriverReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ComplainView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        qs = Complain.objects.filter(user=request.user)
+        serializer = ComplainSerializer(qs, many=True)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, *args, **kwargs):
+        serializer = ComplainSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

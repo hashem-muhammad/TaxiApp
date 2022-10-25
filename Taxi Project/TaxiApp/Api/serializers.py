@@ -1,10 +1,10 @@
 from django.db import transaction
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
-
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from Api.models import CarType, Driver, DriverCar, DriverLocation, Role, StopPoint, Trip, TripType, Message, Price, Coupon
+from Api.models import CarType, Complain, Driver, DriverCar, DriverLocation, DriverReview, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -58,12 +58,31 @@ class StopPointSerializer(serializers.ModelSerializer):
         fields = ['id', 'lat', 'lng', ]
 
 
+class TripCancellationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TripCancellation
+        fields = ['id', 'reason', ]
+
+
 class TripSerializer(serializers.ModelSerializer):
+    trip_cancellation = TripCancellationSerializer(many=True)
 
     class Meta:
         model = Trip
         fields = ['id', 'start_place', 'final_place',
-                  'driver', 'time', 'distance', 'price', ]
+                  'driver', 'time_ending', 'distance', 'price',
+                  'trip_type',
+                  'expected_time',
+                  'price_after_coupon',
+                  'trip_cancellation', 'status', 'user', ]
+
+    def create(self, validated_data):
+        trip_data = validated_data.pop('trip_cancellation')
+        trip = Trip.objects.create(**validated_data)
+        for t_data in trip_data:
+            TripCancellation.objects.create(trip=trip, **t_data)
+        return trip
 
 
 class DriverLocationSerializer(serializers.ModelSerializer):
@@ -109,3 +128,25 @@ class PriceSerializer(serializers.ModelSerializer):
         model = Price
         fields = ['id', 'km_price', 'wait_price',
                   'tax_price', 'extra_price', 'company_per', ]
+
+
+class ComplainSerializer(serializers.ModelSerializer):
+    image = Base64ImageField(required=False)
+
+    class Meta:
+        model = Complain
+        fields = ['id', 'user', 'image', 'complain', ]
+
+
+class TripReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TripReview
+        fields = ['id', 'user_id', 'driver_id', 'review', ]
+
+
+class DriverReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DriverReview
+        fields = ['id', 'user_id', 'driver_id', 'review', ]

@@ -55,15 +55,33 @@ class StopPoint(models.Model):
         return "{}".format(self.point)
 
 
+class TripCancellation(models.Model):
+    id = models.AutoField(primary_key=True)
+    reason = models.CharField(max_length=255)
+    trip = models.ForeignKey('Trip', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self) -> str:
+        return "{}".format(self.reason)
+
+
 class Trip(models.Model):
     id = models.AutoField(primary_key=True)
     start_place = models.CharField(max_length=255)
     final_place = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True)
-    time = models.DateTimeField()
+    time_ending = models.DateTimeField()
+    expected_time = models.DateTimeField(null=True)
     distance = models.FloatField()
     price = models.FloatField()
+    status = models.CharField(max_length=30, default='')
+    trip_type = models.ForeignKey(
+        TripType, on_delete=models.SET_NULL, null=True)
+    price_after_coupon = models.FloatField(null=True)
+
+    @property
+    def trip_cancellation(self):
+        pass
 
     def __str__(self) -> str:
         return "{}".format(self.user)
@@ -143,3 +161,35 @@ class Coupon(models.Model):
 
     def __str__(self) -> str:
         return "{}-{}".format(self.start_date, self.end_date)
+
+
+class DriverReview(models.Model):
+    id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    driver_id = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name='driver_review')
+    review = models.TextField()
+
+    def __str__(self) -> str:
+        return "{}".format(self.user_id)
+
+
+class TripReview(models.Model):
+    id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    driver_id = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name='driver_t_review')
+    review = models.TextField()
+
+    def __str__(self) -> str:
+        return "{}".format(self.user_id)
+
+
+class Complain(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    image = models.ImageField(upload_to='complains/')
+    complain = models.TextField()
+
+    def __str__(self) -> str:
+        return "{}".format(self.user)

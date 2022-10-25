@@ -1,11 +1,11 @@
-pip install Django==3.2
-pip install dj_rest_auth==2.1.11
-pip install djangorestframework==3.12.4
-pip install django-allauth
-pip install mysqlclient
-pip install pymysql
-pip install pillow
-pip install python-dateutil
-pip install coreapi==2.3.3
-pip install djangorestframework-simplejwt
-pip install drf-extra-fields
+Django==3.2
+dj_rest_auth==2.1.11
+djangorestframework==3.12.4
+django-allauth
+mysqlclient
+pymysql
+pillow
+python-dateutil
+coreapi==2.3.3
+djangorestframework-simplejwt
+drf-extra-fields

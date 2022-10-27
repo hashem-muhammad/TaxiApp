@@ -4,7 +4,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from Api.models import CarType, Complain, Driver, DriverCar, DriverLocation, DriverReview, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon
+from Api.models import CarType, Complain, Driver, DriverCar, DriverLocation, DriverReview, Places, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon, User
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -14,14 +14,22 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         refresh = self.get_token(self.user)
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
-
+        data['first_name'] = self.user.first_name
+        data['last_name'] = self.user.last_name
         data['phone_number'] = self.user.phone_number
         data['role'] = self.user.role.id
         return data
 
 
+class UserInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name',
+                  'phone_number', 'birth_date', 'gender', ]
+
+
 class CustomRegisterSerializer(RegisterSerializer):
-    name = serializers.CharField(max_length=150)
     phone_number = serializers.CharField(max_length=30)
     role = serializers.IntegerField()
 
@@ -32,7 +40,6 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.phone_number = self.data.get('phone_number')
         get_role = Role.objects.get(id=self.data.get('role'))
         user.role = get_role
-        user.name = self.data.get('name')
         user.save()
         return user
 
@@ -135,7 +142,7 @@ class ComplainSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Complain
-        fields = ['id', 'user', 'image', 'complain', ]
+        fields = ['id', 'user', 'image', 'complain', "name", "phone", ]
 
 
 class TripReviewSerializer(serializers.ModelSerializer):
@@ -150,3 +157,10 @@ class DriverReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = DriverReview
         fields = ['id', 'user_id', 'driver_id', 'review', ]
+
+
+class PlacesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Places
+        fields = ['id', 'lat', 'lng', 'name', ]

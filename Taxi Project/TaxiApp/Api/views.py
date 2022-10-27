@@ -5,14 +5,29 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
 from yaml import serialize
-from Api.models import CarType, Complain, Coupon, Driver, DriverCar, DriverReview, Message, Price, Trip, TripReview, TripType
-from Api.serializers import CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverCarSerializer, DriverReviewSerializer, DriverSerializer, MessageSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer
+from Api.models import CarType, Complain, Coupon, Driver, DriverCar, DriverReview, Message, Places, Price, Trip, TripReview, TripType, User
+from Api.serializers import CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverCarSerializer, DriverReviewSerializer, DriverSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer
 from django.db.models import Q
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
+
+
+class UserInfoView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        qs = User.objects.filter(id=request.user.id)
+        serializer = UserInfoSerializer(qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, *args, **kwargs):
+        print(request.data)
+        User.objects.filter(id=request.user.id).update(**request.data)
+        return Response({'updated!'}, status=status.HTTP_202_ACCEPTED)
 
 
 class TripTypeView(APIView):
@@ -56,12 +71,22 @@ class TripView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get(self, request, *args, **kwargs):
-        qs = Trip.objects.filter(
-            Q(user=request.user.id) | Q(driver=request.user.id))
-        serializer = TripSerializer(qs, many=True)
-        if qs.exists():
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+        trip_from_date = request.GET.get('from_date', None)
+        trip_until_date = request.GET.get('until_date', None)
+        if not trip_from_date:
+            qs = Trip.objects.filter(
+                Q(user=request.user.id) | Q(driver=request.user.id))
+            serializer = TripSerializer(qs, many=True)
+            if qs.exists():
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            qs = Trip.objects.filter(
+                Q(user=request.user.id) | Q(driver=request.user.id)).filter(created_at__range=[trip_from_date, trip_until_date])
+            serializer = TripSerializer(qs, many=True)
+            if qs.exists():
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
         serializer = TripSerializer(data=request.data)
@@ -207,5 +232,24 @@ class ComplainView(APIView):
         serializer = ComplainSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlacesView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        qs = Places.objects.filter(user=request.user)
+        serializer = PlacesSerializer(qs, many=True)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, *args, **kwargs):
+        serializer = PlacesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

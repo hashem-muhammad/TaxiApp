@@ -16,14 +16,15 @@ class Role(models.Model):
 class User(AbstractUser):
     USERNAME_FIELD = 'phone_number'
     username = None
-    name = models.CharField(max_length=150, null=True)
     phone_number = models.CharField(max_length=14, unique=True)
+    birth_date = models.DateField(null=True, default=None)
+    gender = models.CharField(max_length=10, null=True, default='')
     role = models.ForeignKey(
         Role, on_delete=models.SET_NULL, null=True, blank=True)
     objects = UserManager()
 
     def __str__(self):
-        return f'{self.phone_number} - {self.name}'
+        return f'{self.phone_number}'
 
 
 class TripType(models.Model):
@@ -78,6 +79,7 @@ class Trip(models.Model):
     trip_type = models.ForeignKey(
         TripType, on_delete=models.SET_NULL, null=True)
     price_after_coupon = models.FloatField(null=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     @property
     def trip_cancellation(self):
@@ -168,7 +170,7 @@ class DriverReview(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     driver_id = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name='driver_review')
-    review = models.TextField()
+    review = models.FloatField()
 
     def __str__(self) -> str:
         return "{}".format(self.user_id)
@@ -188,8 +190,21 @@ class TripReview(models.Model):
 class Complain(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=255, null=True, default='')
+    phone = models.CharField(max_length=255, null=True, default='')
     image = models.ImageField(upload_to='complains/')
     complain = models.TextField()
 
     def __str__(self) -> str:
         return "{}".format(self.user)
+
+
+class Places(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    lat = models.FloatField()
+    lng = models.FloatField()
+    name = models.CharField(max_length=255)
+
+    def __str__(self) -> str:
+        return "{}".format(self.name)

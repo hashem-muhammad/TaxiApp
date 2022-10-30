@@ -179,8 +179,8 @@ class DriverReview(models.Model):
 class TripReview(models.Model):
     id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    driver_id = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name='driver_t_review')
+    trip = models.ForeignKey(
+        Trip, on_delete=models.SET_NULL, null=True)
     review = models.TextField()
 
     def __str__(self) -> str:
@@ -192,7 +192,8 @@ class Complain(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=255, null=True, default='')
     phone = models.CharField(max_length=255, null=True, default='')
-    image = models.ImageField(upload_to='complains/')
+    image = models.ImageField(upload_to='complains/', default='')
+    reason = models.TextField(default='')
     complain = models.TextField()
 
     def __str__(self) -> str:

@@ -14,9 +14,12 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         refresh = self.get_token(self.user)
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
+        data['id'] = self.user.id
         data['first_name'] = self.user.first_name
         data['last_name'] = self.user.last_name
         data['phone_number'] = self.user.phone_number
+        data['birth_date'] = self.user.birth_date
+        data['gender'] = self.user.gender
         data['role'] = self.user.role.id
         return data
 
@@ -31,6 +34,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
 class CustomRegisterSerializer(RegisterSerializer):
     phone_number = serializers.CharField(max_length=30)
+    first_name = serializers.CharField(max_length=30)
+    last_name = serializers.CharField(max_length=30)
     role = serializers.IntegerField()
 
     # Define transaction.atomic to rollback the save operation in case of error
@@ -38,6 +43,8 @@ class CustomRegisterSerializer(RegisterSerializer):
     def save(self, request):
         user = super().save(request)
         user.phone_number = self.data.get('phone_number')
+        user.first_name = self.data.get('first_name')
+        user.last_name = self.data.get('last_name')
         get_role = Role.objects.get(id=self.data.get('role'))
         user.role = get_role
         user.save()
@@ -142,14 +149,15 @@ class ComplainSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Complain
-        fields = ['id', 'user', 'image', 'complain', "name", "phone", ]
+        fields = ['id', 'user', 'image',
+                  'complain', "reason", "name", "phone", ]
 
 
 class TripReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TripReview
-        fields = ['id', 'user_id', 'driver_id', 'review', ]
+        fields = ['id', 'user_id', 'trip', 'review', ]
 
 
 class DriverReviewSerializer(serializers.ModelSerializer):

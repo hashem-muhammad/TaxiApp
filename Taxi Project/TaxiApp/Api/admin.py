@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Api.models import CarType, Coupon, Driver, DriverCar, DriverLocation, DriverReview, Message, Price, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, User
+from Api.models import CarType, Complain, Coupon, Driver, DriverCar, DriverLocation, DriverReview, Message, Price, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, User
 
 # Register your models here.
 admin.site.register(CarType)
@@ -18,3 +18,4 @@ admin.site.register(User)
 admin.site.register(TripCancellation)
 admin.site.register(DriverReview)
 admin.site.register(TripReview)
+admin.site.register(Complain)

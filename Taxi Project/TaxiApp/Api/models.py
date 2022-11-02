@@ -68,6 +68,8 @@ class TripCancellation(models.Model):
 class Trip(models.Model):
     id = models.AutoField(primary_key=True)
     start_place = models.CharField(max_length=255)
+    source = models.CharField(max_length=255, default='')
+    destination = models.CharField(max_length=255, default='')
     final_place = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True)
@@ -104,7 +106,7 @@ class DriverCar(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     car_model = models.CharField(max_length=255)
     car_color = models.CharField(max_length=255)
-    car_year = models.DateField()
+    car_year = models.CharField(max_length=255, default='')
     plate_number = models.PositiveSmallIntegerField()
     passengers_number = models.PositiveSmallIntegerField()
     children_seat = models.BooleanField()
@@ -116,14 +118,15 @@ class DriverCar(models.Model):
 class Driver(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    full_name = models.CharField(max_length=255, default='')
     photo = models.ImageField(upload_to='uploads/')
     car_type = models.ForeignKey(CarType, on_delete=models.SET_NULL, null=True)
     car = models.ForeignKey(DriverCar, on_delete=models.SET_NULL, null=True)
     license_number = models.CharField(max_length=50)
     license_image_front = models.ImageField(upload_to='licenses/')
     license_image_back = models.ImageField(upload_to='licenses/')
-    active = models.BooleanField()
-    available = models.BooleanField()
+    active = models.BooleanField(default=False)
+    available = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return "{}".format(self.user)

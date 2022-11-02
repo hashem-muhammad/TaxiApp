@@ -82,7 +82,7 @@ class TripView(APIView):
             return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
         else:
             qs = Trip.objects.filter(
-                Q(user=request.user.id) | Q(driver=request.user.id)).filter(created_at__range=[trip_from_date, trip_until_date])
+                Q(user=request.user.id) | Q(driver=request.user.id)).filter(Q(created_at__range=[trip_from_date, trip_until_date]))
             serializer = TripSerializer(qs, many=True)
             if qs.exists():
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -120,7 +120,7 @@ class DriverView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get(self, request, *args, **kwargs):
-        qs = Driver.objects.filter(user=request.user)
+        qs = Driver.objects.filter(user=request.user, active=True)
         serializer = DriverSerializer(qs, many=True)
         if qs.exists():
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -132,6 +132,14 @@ class DriverView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        available = request.POST['available']
+        get_driver = Driver.objects.filter(user=request.user)
+        if get_driver.exist():
+            get_driver.update(available=available)
+            return Response({'status': 'status updated'}, status=status.HTTP_202_ACCEPTED)
+        return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MessageView(APIView):

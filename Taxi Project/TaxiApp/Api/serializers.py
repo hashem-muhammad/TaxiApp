@@ -89,7 +89,7 @@ class TripSerializer(serializers.ModelSerializer):
                   'trip_type',
                   'expected_time',
                   'price_after_coupon',
-                  'trip_cancellation', 'status', 'user', ]
+                  'trip_cancellation', 'status', 'user', 'source', 'destination', ]
 
     def create(self, validated_data):
         trip_data = validated_data.pop('trip_cancellation')
@@ -115,11 +115,14 @@ class DriverCarSerializer(serializers.ModelSerializer):
 
 
 class DriverSerializer(serializers.ModelSerializer):
+    photo = Base64ImageField(required=False)
+    license_image_front = Base64ImageField(required=False)
+    license_image_back = Base64ImageField(required=False)
 
     class Meta:
         model = Driver
         fields = ['id', 'user', 'photo',
-                  'car_type', 'car', 'license_number', 'license_image_front', 'license_image_back', 'available', ]
+                  'car_type', 'car', 'license_number', 'license_image_front', 'license_image_back', 'available', 'full_name', ]
 
 
 class MessageSerializer(serializers.ModelSerializer):

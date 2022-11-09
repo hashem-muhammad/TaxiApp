@@ -4,7 +4,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from Api.models import CarType, Complain, Driver, DriverCar, DriverLocation, DriverReview, Places, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon, User
+from Api.models import CarType, Complain, Driver, DriverLocation, DriverReview, Driverbalance, Places, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon, User
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -20,16 +20,18 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['phone_number'] = self.user.phone_number
         data['birth_date'] = self.user.birth_date
         data['gender'] = self.user.gender
+        data['profile_image'] = self.user.profile_image
         data['role'] = self.user.role.id
         return data
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    profile_image = Base64ImageField(required=False)
 
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name',
-                  'phone_number', 'birth_date', 'gender', ]
+                  'phone_number', 'birth_date', 'gender', 'profile_image']
 
 
 class CustomRegisterSerializer(RegisterSerializer):
@@ -106,14 +108,6 @@ class DriverLocationSerializer(serializers.ModelSerializer):
         fields = ['id', 'lat', 'lng', ]
 
 
-class DriverCarSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = DriverCar
-        fields = ['id', 'car_model', 'car_color',
-                  'car_year', 'plate_number', 'passengers_number', 'children_seat', ]
-
-
 class DriverSerializer(serializers.ModelSerializer):
     photo = Base64ImageField(required=False)
     license_image_front = Base64ImageField(required=False)
@@ -122,7 +116,8 @@ class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
         fields = ['id', 'user', 'photo',
-                  'car_type', 'car', 'license_number', 'license_image_front', 'license_image_back', 'available', 'full_name', ]
+                  'car_type', 'car', 'license_number', 'license_image_front', 'license_image_back', 'available', 'plate_number', 'car_model', 'car_year', 'car_color', 'car_model', 'car_color',
+                  'car_year', 'plate_number', 'passengers_number', 'children_seat', ]
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -175,3 +170,10 @@ class PlacesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Places
         fields = ['id', 'lat', 'lng', 'name', ]
+
+
+class DriverbalanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Driverbalance
+        fields = ['id', 'driver', 'balance', ]

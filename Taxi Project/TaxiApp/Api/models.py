@@ -19,6 +19,8 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=14, unique=True)
     birth_date = models.DateField(null=True, default=None)
     gender = models.CharField(max_length=10, null=True, default='')
+    profile_image = models.ImageField(
+        upload_to='profiles_image/', null=True, default='')
     role = models.ForeignKey(
         Role, on_delete=models.SET_NULL, null=True, blank=True)
     objects = UserManager()
@@ -101,30 +103,20 @@ class DriverLocation(models.Model):
         return "{}-{}".format(self.lat, self.lng)
 
 
-class DriverCar(models.Model):
-    id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    car_model = models.CharField(max_length=255)
-    car_color = models.CharField(max_length=255)
-    car_year = models.CharField(max_length=255, default='')
-    plate_number = models.PositiveSmallIntegerField()
-    passengers_number = models.PositiveSmallIntegerField()
-    children_seat = models.BooleanField()
-
-    def __str__(self) -> str:
-        return "{} - {}".format(self.car_model, self.user)
-
-
 class Driver(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    full_name = models.CharField(max_length=255, default='')
     photo = models.ImageField(upload_to='uploads/')
     car_type = models.ForeignKey(CarType, on_delete=models.SET_NULL, null=True)
-    car = models.ForeignKey(DriverCar, on_delete=models.SET_NULL, null=True)
     license_number = models.CharField(max_length=50)
     license_image_front = models.ImageField(upload_to='licenses/')
     license_image_back = models.ImageField(upload_to='licenses/')
+    car_model = models.CharField(max_length=255, default='')
+    car_color = models.CharField(max_length=255, default='')
+    car_year = models.CharField(max_length=255, default='')
+    plate_number = models.PositiveSmallIntegerField(default=4)
+    passengers_number = models.PositiveSmallIntegerField(default=4)
+    children_seat = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
     available = models.BooleanField(default=True)
 
@@ -212,3 +204,13 @@ class Places(models.Model):
 
     def __str__(self) -> str:
         return "{}".format(self.name)
+
+
+class Driverbalance(models.Model):
+    id = models.AutoField(primary_key=True)
+    driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    balance = models.FloatField()
+    activate = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return "{}-{}".format(self.driver, self.balance)

@@ -4,9 +4,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
-from yaml import serialize
-from Api.models import CarType, Complain, Coupon, Driver, DriverCar, DriverReview, Message, Places, Price, Trip, TripReview, TripType, User
-from Api.serializers import CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverCarSerializer, DriverReviewSerializer, DriverSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer
+from Api.models import CarType, Complain, Coupon, Driver, DriverReview, Driverbalance, Message, Places, Price, Trip, TripReview, TripType, User
+from Api.serializers import CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverReviewSerializer, DriverSerializer, DriverbalanceSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer
 from django.db.models import Q
 
 
@@ -95,24 +94,14 @@ class TripView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class DriverCarView(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-
-    def get(self, request, *args, **kwargs):
-        qs = DriverCar.objects.filter(user=request.user)
-        serializer = DriverCarSerializer(qs, many=True)
-        if qs.exists():
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
-
-    def post(self, request, *args, **kwargs):
-        serializer = DriverCarSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, *args, **kwargs):
+        if request.POST['trip_id']:
+            trip_data = request.data
+            get_driver = Trip.objects.filter(user=request.user)
+            if get_driver.exist():
+                get_driver.update(**trip_data)
+                return Response({'status': 'data updated'}, status=status.HTTP_202_ACCEPTED)
+            return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DriverView(APIView):
@@ -134,12 +123,20 @@ class DriverView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
-        available = request.POST['available']
-        get_driver = Driver.objects.filter(user=request.user)
-        if get_driver.exist():
-            get_driver.update(available=available)
-            return Response({'status': 'status updated'}, status=status.HTTP_202_ACCEPTED)
-        return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.POST['available']:
+            available = request.POST['available']
+            get_driver = Driver.objects.filter(user=request.user)
+            if get_driver.exist():
+                get_driver.update(available=available)
+                return Response({'status': 'status updated'}, status=status.HTTP_202_ACCEPTED)
+            return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.POST['id']:
+            driver_data = request.data
+            get_driver = Driver.objects.filter(user=request.user)
+            if get_driver.exist():
+                get_driver.update(**driver_data)
+                return Response({'status': 'data updated'}, status=status.HTTP_202_ACCEPTED)
+            return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MessageView(APIView):
@@ -259,5 +256,23 @@ class PlacesView(APIView):
         serializer = PlacesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DriverbalanceView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        qs = Driverbalance.objects.filter(
+            driver=request.user, activate=True).last()
+        serializer = DriverbalanceSerializer(qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        serializer = DriverbalanceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(driver=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

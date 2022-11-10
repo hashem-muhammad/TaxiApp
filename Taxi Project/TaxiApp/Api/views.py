@@ -95,13 +95,15 @@ class TripView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
-        if request.POST['trip_id']:
+        get_trip_id = request.query_params.get('trip_id', None)
+        if get_trip_id:
             trip_data = request.data
-            get_driver = Trip.objects.filter(user=request.user)
-            if get_driver.exist():
+            get_driver = Trip.objects.filter(id=get_trip_id)
+            if get_driver.exists():
                 get_driver.update(**trip_data)
-                return Response({'status': 'data updated'}, status=status.HTTP_202_ACCEPTED)
+                return Response({'data updated'}, status=status.HTTP_202_ACCEPTED)
             return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error'})
 
 
 class DriverView(APIView):
@@ -129,13 +131,6 @@ class DriverView(APIView):
             if get_driver.exist():
                 get_driver.update(available=available)
                 return Response({'status': 'status updated'}, status=status.HTTP_202_ACCEPTED)
-            return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
-        if request.POST['id']:
-            driver_data = request.data
-            get_driver = Driver.objects.filter(user=request.user)
-            if get_driver.exist():
-                get_driver.update(**driver_data)
-                return Response({'status': 'data updated'}, status=status.HTTP_202_ACCEPTED)
             return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
 
 

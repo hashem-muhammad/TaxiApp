@@ -20,7 +20,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['phone_number'] = self.user.phone_number
         data['birth_date'] = self.user.birth_date
         data['gender'] = self.user.gender
-        data['profile_image'] = self.user.profile_image
+        data['profile_image'] = self.user.profile_image if self.user.profile_image else ''
         data['role'] = self.user.role.id
         return data
 

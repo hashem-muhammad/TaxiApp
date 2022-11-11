@@ -111,6 +111,7 @@ class Driver(models.Model):
     license_number = models.CharField(max_length=50)
     license_image_front = models.ImageField(upload_to='licenses/')
     license_image_back = models.ImageField(upload_to='licenses/')
+    image_car = models.ImageField(upload_to='image_car/', default='')
     car_model = models.CharField(max_length=255, default='')
     car_color = models.CharField(max_length=255, default='')
     car_year = models.CharField(max_length=255, default='')

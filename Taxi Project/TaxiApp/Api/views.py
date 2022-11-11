@@ -125,13 +125,12 @@ class DriverView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
-        if request.POST['available']:
-            available = request.POST['available']
-            get_driver = Driver.objects.filter(user=request.user)
-            if get_driver.exist():
-                get_driver.update(available=available)
-                return Response({'status': 'status updated'}, status=status.HTTP_202_ACCEPTED)
-            return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
+        available = request.query_params.get('available', False)
+        get_driver = Driver.objects.filter(user=request.user)
+        if get_driver.exists():
+            get_driver.update(available=available)
+            return Response({'status': 'status updated'}, status=status.HTTP_202_ACCEPTED)
+        return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MessageView(APIView):

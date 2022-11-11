@@ -109,13 +109,17 @@ class DriverLocationSerializer(serializers.ModelSerializer):
 
 
 class DriverSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(
+        read_only=True, source='user.first_name')
+    last_name = serializers.CharField(read_only=True, source='user.last_name')
+    phone = serializers.CharField(read_only=True, source='user.phone_number')
     photo = Base64ImageField(required=False)
     license_image_front = Base64ImageField(required=False)
     license_image_back = Base64ImageField(required=False)
 
     class Meta:
         model = Driver
-        fields = ['id', 'user', 'photo',
+        fields = ['id', 'phone', 'first_name', 'last_name', 'user', 'photo',
                   'car_type', 'license_number', 'license_image_front', 'license_image_back', 'available', 'plate_number', 'car_model', 'car_year', 'car_color', 'car_model', 'car_color',
                   'car_year', 'plate_number', 'passengers_number', 'children_seat', ]
 

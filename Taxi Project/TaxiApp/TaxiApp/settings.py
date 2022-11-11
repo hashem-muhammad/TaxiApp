@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 ROOT_URLCONF = 'TaxiApp.urls'
+USE_TZ = False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,9 +56,10 @@ MIDDLEWARE = [
 ]
 
 REST_USE_JWT = True
+ACCOUNT_LOGOUT_ON_GET = True
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=3600),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 
     'AUTH_HEADER_TYPES': ('Token',),
@@ -108,7 +110,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'TaxiApp.wsgi.application'
-
+ACCOUNT_LOGOUT_ON_GET = True
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -150,8 +152,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_L10N = True
-
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)

@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from Api.models import CarType, Complain, Coupon, Driver, DriverReview, Driverbalance, Message, Places, Price, Trip, TripReview, TripType, User
 from Api.serializers import CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverReviewSerializer, DriverSerializer, DriverbalanceSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer
 from django.db.models import Q
+from django.db.models import Sum
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
@@ -72,9 +73,10 @@ class TripView(APIView):
     def get(self, request, *args, **kwargs):
         trip_from_date = request.GET.get('from_date', None)
         trip_until_date = request.GET.get('until_date', None)
+        get_trip = request.GET.get('trip_id', None)
         if not trip_from_date:
             qs = Trip.objects.filter(
-                Q(user=request.user.id) | Q(driver=request.user.id))
+                Q(user=request.user) | Q(driver=request.user))
             serializer = TripSerializer(qs, many=True)
             if qs.exists():
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -104,6 +106,20 @@ class TripView(APIView):
                 return Response({'data updated'}, status=status.HTTP_202_ACCEPTED)
             return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'error'})
+
+
+class TripByIdView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        get_trip = request.GET.get('trip_id', None)
+        qs = Trip.objects.filter(
+            Q(user=request.user) | Q(driver=request.user)).filter(id=get_trip)
+        serializer = TripSerializer(qs, many=True)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class DriverView(APIView):
@@ -260,9 +276,8 @@ class DriverbalanceView(APIView):
 
     def get(self, request, *args, **kwargs):
         qs = Driverbalance.objects.filter(
-            driver=request.user, activate=True).last()
-        serializer = DriverbalanceSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            driver=request.user, activate=True).aggregate(total_balance=Sum('balance'))
+        return Response(qs, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = DriverbalanceSerializer(data=request.data)

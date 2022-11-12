@@ -74,7 +74,8 @@ class Trip(models.Model):
     destination = models.CharField(max_length=255, default='')
     final_place = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True)
+    driver = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name='Driver')
     time_ending = models.DateTimeField()
     expected_time = models.DateTimeField(null=True)
     distance = models.FloatField()

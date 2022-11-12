@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from Api.views import CarTypeView, ComplainView, CouponView, DriverReviewView, DriverView, DriverbalanceView, MyObtainTokenPairView, MessageView, PlacesView, PriceView, StopPointView, TripReviewView, TripTypeView, TripView, UserInfoView
+from Api.views import CarTypeView, ComplainView, CouponView, DriverReviewView, DriverView, DriverbalanceView, MyObtainTokenPairView, MessageView, PlacesView, PriceView, StopPointView, TripByIdView, TripReviewView, TripTypeView, TripView, UserInfoView
 
 urlpatterns = [
     path('auth/register/', include('dj_rest_auth.registration.urls')),
@@ -9,6 +9,7 @@ urlpatterns = [
     path('user_info/', UserInfoView.as_view()),
     path('trip_type/', TripTypeView.as_view()),
     path('trip/', TripView.as_view()),
+    path('trip_id/', TripByIdView.as_view()),
     path('car_type/', CarTypeView.as_view()),
     path('stop_point/', StopPointView.as_view()),
     path('driver_balance/', DriverbalanceView.as_view()),

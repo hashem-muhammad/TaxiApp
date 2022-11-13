@@ -20,7 +20,7 @@ class User(AbstractUser):
     birth_date = models.DateField(null=True, default=None)
     gender = models.CharField(max_length=10, null=True, default='')
     profile_image = models.ImageField(
-        upload_to='profiles_image/', null=True, default='')
+        upload_to='profiles_image/', null=True, default=None)
     role = models.ForeignKey(
         Role, on_delete=models.SET_NULL, null=True, blank=True)
     objects = UserManager()

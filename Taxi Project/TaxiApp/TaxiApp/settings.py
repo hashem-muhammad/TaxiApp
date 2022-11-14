@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-n3hw*_pl58eib5*ke&_mdrxg+w9t0mch2j&&0a9$k-p5^u6lhc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['95.159.59.7']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'channels',
     'Api',
     'rest_framework',
     'rest_framework.authtoken',
@@ -56,6 +57,8 @@ MIDDLEWARE = [
 ]
 
 REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'token'
+JWT_AUTH_REFRESH_COOKIE = 'refresh-token'
 ACCOUNT_LOGOUT_ON_GET = True
 
 SIMPLE_JWT = {
@@ -110,8 +113,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'TaxiApp.wsgi.application'
-ACCOUNT_LOGOUT_ON_GET = True
+ASGI_APPLICATION = 'TaxiApp.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 

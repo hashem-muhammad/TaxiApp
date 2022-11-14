@@ -84,11 +84,9 @@ class Trip(models.Model):
     trip_type = models.ForeignKey(
         TripType, on_delete=models.SET_NULL, null=True)
     price_after_coupon = models.FloatField(null=True)
+    trip_cancellation = models.TextField(default='', null=True)
     created_at = models.DateTimeField(auto_now=True)
 
-    @property
-    def trip_cancellation(self):
-        pass
 
     def __str__(self) -> str:
         return "{}".format(self.user)

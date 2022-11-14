@@ -30,6 +30,19 @@ class UserInfoView(APIView):
         return Response({'updated!'}, status=status.HTTP_202_ACCEPTED)
 
 
+class UserByIdView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        get_user = request.GET.get('user_id', None)
+        qs = User.objects.filter(id=get_user)
+        serializer = UserInfoSerializer(qs, many=True)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class TripTypeView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
@@ -147,6 +160,20 @@ class DriverView(APIView):
             get_driver.update(available=available)
             return Response({'status': 'status updated'}, status=status.HTTP_202_ACCEPTED)
         return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class DriverByIdView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        get_driver = request.GET.get('driver_id', None)
+        qs = Driver.objects.filter(user__id=get_driver).select_related('user')
+        serializer = DriverSerializer(qs, many=True)
+        if qs.exists():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class MessageView(APIView):

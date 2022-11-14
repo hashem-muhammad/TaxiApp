@@ -74,15 +74,8 @@ class StopPointSerializer(serializers.ModelSerializer):
         fields = ['id', 'lat', 'lng', ]
 
 
-class TripCancellationSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = TripCancellation
-        fields = ['id', 'reason', ]
-
 
 class TripSerializer(serializers.ModelSerializer):
-    trip_cancellation = TripCancellationSerializer(many=True)
 
     class Meta:
         model = Trip
@@ -92,13 +85,6 @@ class TripSerializer(serializers.ModelSerializer):
                   'expected_time',
                   'price_after_coupon',
                   'trip_cancellation', 'status', 'user', 'source', 'destination', ]
-
-    def create(self, validated_data):
-        trip_data = validated_data.pop('trip_cancellation')
-        trip = Trip.objects.create(**validated_data)
-        for t_data in trip_data:
-            TripCancellation.objects.create(trip=trip, **t_data)
-        return trip
 
 
 class DriverLocationSerializer(serializers.ModelSerializer):

@@ -39,6 +39,7 @@ class CustomRegisterSerializer(RegisterSerializer):
     phone_number = serializers.CharField(max_length=30)
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=30)
+    firebase_token = serializers.CharField(max_length=255)
     role = serializers.IntegerField()
 
     # Define transaction.atomic to rollback the save operation in case of error
@@ -48,6 +49,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.phone_number = self.data.get('phone_number')
         user.first_name = self.data.get('first_name')
         user.last_name = self.data.get('last_name')
+        user.firebase_token = self.data.get('firebase_token')
         get_role = Role.objects.get(id=self.data.get('role'))
         user.role = get_role
         user.save()

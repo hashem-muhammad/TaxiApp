@@ -23,6 +23,7 @@ class User(AbstractUser):
         upload_to='profiles_image/', null=True, default=None)
     role = models.ForeignKey(
         Role, on_delete=models.SET_NULL, null=True, blank=True)
+    firebase_token = models.TextField(null=True, blank=True)
     objects = UserManager()
 
     def __str__(self):

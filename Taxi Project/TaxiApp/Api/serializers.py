@@ -20,6 +20,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['phone_number'] = self.user.phone_number
         data['birth_date'] = self.user.birth_date
         data['gender'] = self.user.gender
+        data['firebase_token'] = self.user.firebase_token
         data['profile_image'] = self.user.profile_image if self.user.profile_image else ''
         data['role'] = self.user.role.id
         return data
@@ -31,7 +32,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name',
-                  'phone_number', 'birth_date', 'gender', 'profile_image']
+                  'phone_number', 'birth_date', 'gender', 'profile_image', 'firebase_token',]
 
 
 class CustomRegisterSerializer(RegisterSerializer):

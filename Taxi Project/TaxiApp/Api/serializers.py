@@ -21,7 +21,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['birth_date'] = self.user.birth_date
         data['gender'] = self.user.gender
         data['firebase_token'] = self.user.firebase_token
-        data['profile_image'] = self.user.profile_image if self.user.profile_image else ''
+        data['profile_image'] = self.user.profile_image.url if self.user.profile_image.url else ''
         data['role'] = self.user.role.id
         return data
 

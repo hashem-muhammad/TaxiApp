@@ -2,6 +2,7 @@ from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from Api.Manager.UserManager import UserManager
+from django.utils.html import mark_safe
 # Create your models here.
 
 
@@ -124,6 +125,27 @@ class Driver(models.Model):
     def __str__(self) -> str:
         return "{}".format(self.user)
 
+    @property
+    def image_photo(self):
+        if self.photo:
+            return mark_safe('<img src="{}" width="200" height="200" />'.format(self.photo.url))
+        else:
+            return 'No Image Found'
+
+    @property
+    def image_li_front(self):
+        if self.license_image_front:
+            return mark_safe('<img src="{}" width="200" height="200" />'.format(self.license_image_front.url))
+        else:
+            return 'No Image Found'
+
+    @property
+    def image_li_back(self):
+        if self.license_image_back:
+            return mark_safe('<img src="{}" width="200" height="200" />'.format(self.license_image_back.url))
+        else:
+            return 'No Image Found'
+
 
 class Message(models.Model):
     id = models.AutoField(primary_key=True)
@@ -132,6 +154,13 @@ class Message(models.Model):
     image = models.ImageField(upload_to='uploads/')
     status = models.SmallIntegerField(null=True, blank=True, default=0)
     created_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def image_img(self):
+        if self.image:
+            return mark_safe('<img src="{}" width="200" height="200" />'.format(self.image.url))
+        else:
+            return 'No Image Found'
 
     def __str__(self) -> str:
         return "{}".format(self.user)
@@ -191,6 +220,13 @@ class Complain(models.Model):
     image = models.ImageField(upload_to='complains/', default='')
     reason = models.TextField(default='')
     complain = models.TextField()
+
+    @property
+    def image_img(self):
+        if self.image:
+            return mark_safe('<img src="{}" width="200" height="200" />'.format(self.image.url))
+        else:
+            return 'No Image Found'
 
     def __str__(self) -> str:
         return "{}".format(self.user)

@@ -59,7 +59,6 @@ MIDDLEWARE = [
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'token'
 JWT_AUTH_REFRESH_COOKIE = 'refresh-token'
-ACCOUNT_LOGOUT_ON_GET = True
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=3600),
@@ -166,7 +165,7 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 

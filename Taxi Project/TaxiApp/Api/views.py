@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
 from Api.models import CarType, Complain, Coupon, Driver, DriverReview, Driverbalance, Message, Places, Price, Trip, TripReview, TripType, User
-from Api.serializers import CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverReviewSerializer, DriverSerializer, DriverbalanceSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer
+from Api.serializers import CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverReviewSerializer, DriverSerializer, DriverStatusSerializer, DriverbalanceSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer
 from django.db.models import Q
 from django.db.models import Sum
 from Api.FCM_Manager import send_notify
@@ -321,3 +321,14 @@ class DriverbalanceView(APIView):
             serializer.save(driver=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DirverStatusView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            qs = Driver.objects.get(id=request.user.id)
+            serializer = DriverStatusSerializer(qs)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

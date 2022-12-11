@@ -21,7 +21,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['birth_date'] = self.user.birth_date
         data['gender'] = self.user.gender
         data['firebase_token'] = self.user.firebase_token
-        data['profile_image'] = self.user.profile_image.url if self.user.profile_image.url else ''
+        data['profile_image'] = self.user.profile_image.url if self.user.profile_image else ''
         data['role'] = self.user.role.id
         return data
 
@@ -113,6 +113,12 @@ class DriverSerializer(serializers.ModelSerializer):
                   'car_type', 'license_number', 'license_image_front', 'license_image_back', 'available', 'plate_number', 'car_model', 'car_year', 'car_color', 'car_model', 'car_color',
                   'car_year', 'plate_number', 'passengers_number', 'children_seat', ]
 
+
+class DriverStatusSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Driver
+        fields = ['active',]
 
 class MessageSerializer(serializers.ModelSerializer):
 

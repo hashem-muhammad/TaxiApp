@@ -4,7 +4,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from Api.models import CarType, Complain, Driver, DriverLocation, DriverReview, Driverbalance, Places, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon, User
+from Api.models import AccountActivation, CarType, Complain, Driver, DriverLocation, DriverReview, Driverbalance, Places, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon, User
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -34,6 +34,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name',
                   'phone_number', 'birth_date', 'gender', 'profile_image', 'firebase_token',]
 
+
+class UserNotificationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['firebase_token',]
 
 class CustomRegisterSerializer(RegisterSerializer):
     phone_number = serializers.CharField(max_length=30)
@@ -131,7 +137,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Coupon
-        fields = ['id', 'value', 'coupon', 'start_date', 'end_date', ]
+        fields = ['id', 'value', 'coupon', 'start_date', 'end_date','status', ]
 
 
 class PriceSerializer(serializers.ModelSerializer):
@@ -177,3 +183,10 @@ class DriverbalanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driverbalance
         fields = ['id', 'driver', 'balance', ]
+
+
+class AccountActivationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AccountActivation
+        fields = ['id', 'user', 'status', 'otp',]

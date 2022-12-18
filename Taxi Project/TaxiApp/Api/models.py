@@ -25,6 +25,7 @@ class User(AbstractUser):
     role = models.ForeignKey(
         Role, on_delete=models.SET_NULL, null=True, blank=True)
     firebase_token = models.TextField(null=True, blank=True)
+    registered_at = models.DateTimeField(auto_now=True)
     objects = UserManager()
 
     def __str__(self):
@@ -121,9 +122,18 @@ class Driver(models.Model):
     children_seat = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
     available = models.BooleanField(default=True)
+    registered_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return "{}".format(self.user)
+
+    @property
+    def driver_balance(self):
+        try:
+            get_balance = Driverbalance.objects.get(driver=self.id).balance
+            return get_balance
+        except:
+            return 0
 
     @property
     def image_photo(self):
@@ -185,6 +195,8 @@ class Coupon(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     active = models.BooleanField()
+    status = models.CharField(max_length=100, null=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return "{}-{}".format(self.start_date, self.end_date)
@@ -220,6 +232,7 @@ class Complain(models.Model):
     image = models.ImageField(upload_to='complains/', default='')
     reason = models.TextField(default='')
     complain = models.TextField()
+    created_at = models.DateTimeField(auto_now=True)
 
     @property
     def image_img(self):
@@ -251,3 +264,17 @@ class Driverbalance(models.Model):
 
     def __str__(self) -> str:
         return "{}-{}".format(self.driver, self.balance)
+
+
+class AccountActivation(models.Model):
+    STATUS = [
+        (True, 'ACTIVE'),
+        (False, 'DISACTIVE'),
+    ]
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp = models.SmallIntegerField()
+    status = models.BooleanField(default=False, choices=STATUS)
+
+    def __str__(self):
+        return "{}, {}".format(self.user, self.otp)

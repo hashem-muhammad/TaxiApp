@@ -34,7 +34,8 @@ class User(AbstractUser):
 
 class TripType(models.Model):
     id = models.AutoField(primary_key=True)
-    type = models.CharField(max_length=100)
+    type = models.CharField(max_length=100, verbose_name="Name")
+    arabic_type = models.CharField(max_length=100, verbose_name="Arbaic Name", null=True)
 
     def __str__(self) -> str:
         return "{}".format(self.type)
@@ -42,8 +43,8 @@ class TripType(models.Model):
 
 class CarType(models.Model):
     id = models.AutoField(primary_key=True)
-    type = models.CharField(max_length=100)
-    price = models.FloatField(default=0.0)
+    type = models.CharField(max_length=100, verbose_name='Name')
+    arabic_type = models.CharField(max_length=100, verbose_name='Arabic Name', null=True)
     trip_type = models.ForeignKey(
         TripType, on_delete=models.SET_NULL, null=True)
 
@@ -192,6 +193,8 @@ class Coupon(models.Model):
     id = models.AutoField(primary_key=True)
     value = models.FloatField(default=0.0)
     coupon = models.CharField(max_length=60, default='')
+    coupon_type = models.CharField(max_length=60, null=True)
+    arabic_coupon_type = models.CharField(max_length=60, null=True)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     active = models.BooleanField()

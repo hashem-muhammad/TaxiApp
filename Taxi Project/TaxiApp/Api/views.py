@@ -101,14 +101,14 @@ class TripView(APIView):
             serializer = TripSerializer(qs, many=True)
             if qs.exists():
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'No data'}, status=status.HTTP_200_OK)
         else:
             qs = Trip.objects.filter(
                 Q(user=request.user.id) | Q(driver=request.user.id)).filter(Q(created_at__range=[trip_from_date, trip_until_date]))
             serializer = TripSerializer(qs, many=True)
             if qs.exists():
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response({'No data'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'No data'}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = TripSerializer(data=request.data)

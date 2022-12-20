@@ -23,6 +23,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['firebase_token'] = self.user.firebase_token
         data['profile_image'] = self.user.profile_image.url if self.user.profile_image else ''
         data['role'] = self.user.role.id
+        data['account_status'] = ''
+        try:    
+            get_driver = Driver.objects.get(user=self.user).active
+            data['account_status'] = get_driver
+        except:
+            pass
+
         return data
 
 
@@ -66,14 +73,14 @@ class TripTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TripType
-        fields = ['id', 'type', ]
+        fields = ['id', 'type', 'arabic_type',]
 
 
 class CarTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarType
-        fields = ['id', 'type', 'price', ]
+        fields = ['id', 'type', 'arabic_type', ]
 
 
 class StopPointSerializer(serializers.ModelSerializer):
@@ -137,7 +144,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Coupon
-        fields = ['id', 'value', 'coupon', 'start_date', 'end_date','status', ]
+        fields = ['id', 'value', 'coupon', 'coupon_type', 'arabic_coupon_type', 'start_date', 'end_date','status', ]
 
 
 class PriceSerializer(serializers.ModelSerializer):

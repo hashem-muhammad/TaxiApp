@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.sites.models import Site
-from Api.models import CarType, Complain, Coupon, Driver, DriverLocation, DriverReview, Driverbalance, Message, Price, Role, StopPoint, Trip, TripReview, TripType, User
+from Api.models import AccountActivation, CarType, Complain, Coupon, Driver, DriverLocation, DriverReview, Driverbalance, Message, Price, Role, StopPoint, Trip, TripReview, TripType, User
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
 from django.db.models import Sum
@@ -268,6 +268,20 @@ class DriverbalanceAdmin(admin.ModelAdmin):
     list_display = ('driver', 'balance', 'activate', )
     search_fields = ("driver__phone_number", 'driver__first_name', 'activate', 'balance',)
     autocomplete_fields = ['driver', ]
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['driver'].widget.can_change_related = False
+        form.base_fields['driver'].widget.can_add_related = False
+        form.base_fields['driver'].widget.can_delete_related = False
+        return form
+
+
+@ admin.register(AccountActivation)
+class DriverbalanceAdmin(admin.ModelAdmin):
+    list_display = ('user', 'status', 'otp', )
+    search_fields = ("user__phone_number", 'user__first_name', 'status', 'otp',)
+    autocomplete_fields = ['user', ]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)

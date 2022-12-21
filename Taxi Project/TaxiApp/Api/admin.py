@@ -31,6 +31,14 @@ class UserAdmin(UserAdmin):
         ('Others', {'fields': ('registered_at', 'gender',)}),
     )
 
+    add_fieldsets = (
+        (None, {'fields': ('phone_number', 'password1', 'password2')}),
+        ('Permissions', {
+         'fields': ('is_active', 'is_staff', 'role', 'groups',)}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'birth_date',)}),
+        ('Others', {'fields': ('registered_at', 'gender',)}),
+    )
+
     list_display = ('phone_number', 'birth_date', 'gender', 'total_trips', 'is_active', 'registered_at',)
     list_filter = ('phone_number', 'gender')
     search_fields = ('phone_number', 'birth_date__date', 'gender', 'total_trips', 'is_active', 'registered_at',)

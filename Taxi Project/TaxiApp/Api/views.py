@@ -356,6 +356,13 @@ class AccountActivationView(APIView):
             return Response({'valid':True}, status=status.HTTP_200_OK)
         return Response({'valid':False}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def post(self, request, *args, **kwargs):
+        get_request_otp = request.data.get('otp', None)
+        totp = pyotp.TOTP('base32secret3232', interval=1080, digits=4)
+        otp = totp.now()
+        AccountActivation.objects.create(user=request.user, otp=otp)
+        return Response({'otp':'created'}, status=status.HTTP_200_OK)
+
 
 
 class ExtarForCarView(APIView):

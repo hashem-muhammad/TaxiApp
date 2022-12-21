@@ -281,3 +281,17 @@ class AccountActivation(models.Model):
 
     def __str__(self):
         return "{}, {}".format(self.user, self.otp)
+
+
+class ExtraForCar(models.Model):
+    STATUS = [
+        (True, 'ACTIVE'),
+        (False, 'DISACTIVE'),
+    ]
+    id = models.AutoField(primary_key=True)
+    extra = models.CharField(max_length=100)
+    extra_arabic = models.CharField(max_length=100, null=True)
+    active = models.BooleanField(default=False, choices=STATUS)
+
+    def __str__(self):
+        return "{}".format(self.extra)

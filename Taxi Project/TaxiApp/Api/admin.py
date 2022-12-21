@@ -25,16 +25,17 @@ class UserAdmin(UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('phone_number', 'password',)}),
-        ('Personal info', {'fields': ('phone_number', 'first_name', 'last_name',)}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'birth_date',)}),
         ('Permissions', {
          'fields': ('is_active', 'is_staff', 'role', 'groups',)}),
-        ('Others', {'fields': ('birth_date','registered_at', 'gender',)}),
+        ('Others', {'fields': ('registered_at', 'gender',)}),
     )
 
     list_display = ('phone_number', 'birth_date', 'gender', 'total_trips', 'is_active', 'registered_at',)
     list_filter = ('phone_number', 'gender')
     search_fields = ('phone_number', 'birth_date__date', 'gender', 'total_trips', 'is_active', 'registered_at',)
     list_editable = ('is_active',)
+    ordering = ['phone_number', ]
 
     def total_trips(self, obj):
         tip = Trip.objects.filter(

@@ -1,13 +1,14 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.sites.models import Site
-from Api.models import AccountActivation, CarType, Complain, Coupon, Driver, DriverLocation, DriverReview, Driverbalance, Message, Price, Role, StopPoint, Trip, TripReview, TripType, User
+from Api.models import AccountActivation, CarType, Complain, Coupon, Driver, DriverLocation, DriverReview, Driverbalance, ExtraForCar, Message, Price, Role, StopPoint, Trip, TripReview, TripType, User
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
 from django.db.models import Sum
 from allauth.socialaccount.models import SocialApp
 from allauth.account.models import EmailAddress
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.admin import UserAdmin
 
 
 
@@ -17,6 +18,29 @@ admin.site.site_title = "Sayara Admin"
 
 admin.site.unregister(Site)
 # admin.site.unregister(EmailAddress)
+
+
+@ admin.register(User)
+class UserAdmin(UserAdmin):
+
+    fieldsets = (
+        (None, {'fields': ('phone_number', 'password',)}),
+        ('Personal info', {'fields': ('phone_number', 'first_name', 'last_name',)}),
+        ('Permissions', {
+         'fields': ('is_active', 'is_staff', 'role', 'groups',)}),
+        ('Others', {'fields': ('birth_date','registered_at', 'gender',)}),
+    )
+
+    list_display = ('phone_number', 'birth_date', 'gender', 'total_trips', 'is_active', 'registered_at',)
+    list_filter = ('phone_number', 'gender')
+    search_fields = ('phone_number', 'birth_date__date', 'gender', 'total_trips', 'is_active', 'registered_at',)
+    list_editable = ('is_active',)
+
+    def total_trips(self, obj):
+        tip = Trip.objects.filter(
+            user__id=obj.id).aggregate(trips_count=Sum('user'))
+        return tip['trips_count']
+
 
 
 @ admin.register(CarType)
@@ -82,6 +106,7 @@ class DriverLocationAdmin(admin.ModelAdmin):
 
 @ admin.register(Driver)
 class DriverAdmin(admin.ModelAdmin):
+
     list_display = ('user', 'driver_name', 'car_model','car_color','plate_number', 'license_number', 'available', 'active', "driver_balance", "registered_at", "total_distance", "total_trips", "total_balance", "driver_review",)
     list_filter = ('user__phone_number', 'active',)
     search_fields = ("user__phone_number", 'car_model', 'car_color', 'active', 'total_trips', 'available', 'license_number', 'plate_number', 'user__first_name',)
@@ -144,7 +169,7 @@ class DriverAdmin(admin.ModelAdmin):
     def image_license_image_back(self, obj):
         return obj.image_li_back
 
-    image_photo.short_description = 'Image Preview'
+    image_photo.short_description = 'Driver Photo'
     image_photo.allow_tags = True
 
     image_license_image_front.short_description = 'License image front'
@@ -176,6 +201,12 @@ class PriceAdmin(admin.ModelAdmin):
     list_display = ('km_price', 'wait_price', 'tax_price', 'extra_price', 'company_per',)
     search_fields = ('km_price', 'wait_price', 'tax_price', 'extra_price', 'company_per',)
 
+    def has_add_permission(self, request) -> bool:
+        return False
+
+    def has_delete_permission(self, request, obj=None) -> bool:
+        return False
+
 
 @ admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
@@ -183,18 +214,6 @@ class CouponAdmin(admin.ModelAdmin):
     list_filter = ('value', 'active')
     search_fields = ('value', 'coupon', 'start_date__date', 'end_date__date', 'active', 'status', 'created_at',)
 
-
-@ admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('phone_number', 'birth_date', 'gender', 'total_trips', 'is_active', 'registered_at',)
-    list_filter = ('phone_number', 'gender')
-    search_fields = ('phone_number', 'birth_date__date', 'gender', 'total_trips', 'is_active', 'registered_at',)
-    list_editable = ('is_active',)
-
-    def total_trips(self, obj):
-        tip = Trip.objects.filter(
-            user__id=obj.id).aggregate(trips_count=Sum('user'))
-        return tip['trips_count']
 
 
 @ admin.register(DriverReview)
@@ -278,17 +297,25 @@ class DriverbalanceAdmin(admin.ModelAdmin):
 
 
 @ admin.register(AccountActivation)
-class DriverbalanceAdmin(admin.ModelAdmin):
+class AccountActivationAdmin(admin.ModelAdmin):
     list_display = ('user', 'status', 'otp', )
     search_fields = ("user__phone_number", 'user__first_name', 'status', 'otp',)
     autocomplete_fields = ['user', ]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields['driver'].widget.can_change_related = False
-        form.base_fields['driver'].widget.can_add_related = False
-        form.base_fields['driver'].widget.can_delete_related = False
+        form.base_fields['user'].widget.can_change_related = False
+        form.base_fields['user'].widget.can_add_related = False
+        form.base_fields['user'].widget.can_delete_related = False
         return form
+
+
+@ admin.register(ExtraForCar)
+class ExtraForCarAdmin(admin.ModelAdmin):
+    list_display = ('extra', 'extra_arabic', 'active', )
+    search_fields = ('extra', 'extra_arabic', 'active',)
+
+
 # Register your models here.
 # admin.site.register(CarType)
 # admin.site.register(Role)

@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
-from Api.models import AccountActivation, CarType, Complain, Coupon, Driver, DriverReview, Driverbalance, Message, Places, Price, Trip, TripReview, TripType, User
-from Api.serializers import AccountActivationSerializer, CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverReviewSerializer, DriverSerializer, DriverStatusSerializer, DriverbalanceSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer, UserNotificationSerializer
+from Api.models import AccountActivation, CarType, Complain, Coupon, Driver, DriverReview, Driverbalance, ExtraForCar, Message, Places, Price, Trip, TripReview, TripType, User
+from Api.serializers import AccountActivationSerializer, CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverReviewSerializer, DriverSerializer, DriverStatusSerializer, DriverbalanceSerializer, ExtraForCarSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer, UserNotificationSerializer
 from django.db.models import Q
 from django.db.models import Sum
 import pyotp
@@ -352,22 +352,20 @@ class AccountActivationView(APIView):
         otp = request.query_params.get('otp', None)
         check_otp = AccountActivation.objects.filter(user=request.user, otp=otp).exists()
         if check_otp:
+            AccountActivation.objects.filter(user=request.user).update(status=True)
             return Response({'valid':True}, status=status.HTTP_200_OK)
         return Response({'valid':False}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-    def post(self, request, *args, **kwargs):
-        serializer = AccountActivationSerializer(data=request.data)
-        if serializer.is_valid():
-            totp = pyotp.TOTP('base32secret3232', interval=1080)
-            otp = totp.now()
-            serializer.save(user=request.user, otp=otp)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def patch(self, request, *args, **kwargs):
-        qs = AccountActivation.objects.get(user=request.user)
-        serializer = AccountActivationSerializer(qs, many=True, partial=True)
+class ExtarForCarView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        qs = ExtraForCar.objects.filter(active=True)
+        serializer = ExtraForCarSerializer(qs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     

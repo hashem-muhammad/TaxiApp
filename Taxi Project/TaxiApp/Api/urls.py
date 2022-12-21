@@ -2,7 +2,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from Api.views import AccountActivationView, CarTypeView, ComplainView, CouponView, DirverStatusView, DriverByIdView, DriverReviewView, DriverView, DriverbalanceView, MyObtainTokenPairView, MessageView, PlacesView, PriceView, StopPointView, TripByIdView, TripReviewView, TripTypeView, TripView, UserByIdView, UserInfoView, UserNotificationView
+from Api.views import AccountActivationView, CarTypeView, ComplainView, CouponView, DirverStatusView, DriverByIdView, DriverReviewView, DriverView, DriverbalanceView, ExtarForCarView, MyObtainTokenPairView, MessageView, PlacesView, PriceView, StopPointView, TripByIdView, TripReviewView, TripTypeView, TripView, UserByIdView, UserInfoView, UserNotificationView
 
 urlpatterns = [
     path('auth/register/', include('dj_rest_auth.registration.urls')),
@@ -28,6 +28,7 @@ urlpatterns = [
     path('driver_status/', DirverStatusView.as_view()),
     path('update_token/', UserNotificationView.as_view()),
     path('account_activate/', AccountActivationView.as_view()),
+    path('extra_for_car/', ExtarForCarView.as_view()),
 
 ]
 

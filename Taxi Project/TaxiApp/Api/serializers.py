@@ -4,7 +4,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from Api.models import AccountActivation, CarType, Complain, Driver, DriverLocation, DriverReview, Driverbalance, Places, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon, User
+from Api.models import AccountActivation, CarType, Complain, Driver, DriverLocation, DriverReview, Driverbalance, ExtraForCar, Places, Role, StopPoint, Trip, TripCancellation, TripReview, TripType, Message, Price, Coupon, User
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -197,3 +197,10 @@ class AccountActivationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountActivation
         fields = ['id', 'user', 'status', 'otp',]
+
+
+class ExtraForCarSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ExtraForCar
+        fields = ['id', 'extra', 'extra_arabic',]

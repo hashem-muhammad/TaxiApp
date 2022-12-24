@@ -36,7 +36,7 @@ class UserAdmin(UserAdmin):
         ('Permissions', {
          'fields': ('is_active', 'is_staff', 'role', 'groups',)}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'birth_date',)}),
-        ('Others', {'fields': ('registered_at', 'gender',)}),
+        ('Others', {'fields': ('gender',)}),
     )
 
     list_display = ('phone_number', 'birth_date', 'gender', 'total_trips', 'is_active', 'registered_at',)
@@ -69,12 +69,12 @@ class RoleAdmin(admin.ModelAdmin):
 class TripTypeAdmin(admin.ModelAdmin):
     list_display = ('type',)
 
-@ admin.register(StopPoint)
-class StopPointAdmin(admin.ModelAdmin):
-    list_display = ('user', 'lat', 'lng',)
-    list_filter = ('user__phone_number',)
-    search_fields = ("user__phone_number", 'user__first_name',)
-    autocomplete_fields = ['user', ]
+# @ admin.register(StopPoint)
+# class StopPointAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'lat', 'lng',)
+#     list_filter = ('user__phone_number',)
+#     search_fields = ("user__phone_number", 'user__first_name',)
+#     autocomplete_fields = ['user', ]
 
 
 @ admin.register(Trip)

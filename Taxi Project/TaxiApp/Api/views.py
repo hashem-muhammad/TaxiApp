@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
+from Api.FCM_Manager import send_notify
 from Api.models import AccountActivation, CarType, Complain, Coupon, Driver, DriverReview, Driverbalance, ExtraForCar, Message, Places, Price, Trip, TripReview, TripType, User
 from Api.serializers import AccountActivationSerializer, CarTypeSerializer, ComplainSerializer, CouponSerializer, DriverReviewSerializer, DriverSerializer, DriverStatusSerializer, DriverbalanceSerializer, ExtraForCarSerializer, MessageSerializer, PlacesSerializer, PriceSerializer, StopPointSerializer, TripReviewSerializer, TripSerializer, TripTypeSerializer, MyTokenObtainPairSerializer, UserInfoSerializer, UserNotificationSerializer
 from django.db.models import Q
@@ -112,7 +113,6 @@ class TripView(APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = TripSerializer(data=request.data)
-
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -324,10 +324,12 @@ class DriverbalanceView(APIView):
 
 
 class DirverStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def get(self, request, *args, **kwargs):
         try:
-            qs = Driver.objects.get(user=request.user)
+            qs = Driver.objects.filter(user=request.user)
             serializer = DriverStatusSerializer(qs, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:

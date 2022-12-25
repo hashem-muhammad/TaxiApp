@@ -9,4 +9,4 @@ python-dateutil
 coreapi==2.3.3
 djangorestframework-simplejwt
 drf-extra-fields
-pyotp==2.8.0
+reportlab

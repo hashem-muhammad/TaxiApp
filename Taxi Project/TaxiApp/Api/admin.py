@@ -1,6 +1,8 @@
+import csv
 from django import forms
 from django.contrib import admin
 from django.contrib.sites.models import Site
+from django.http import HttpResponse
 from Api.models import AccountActivation, CarType, Complain, Coupon, Driver, DriverLocation, DriverReview, Driverbalance, ExtraForCar, Message, Price, Role, StopPoint, Trip, TripReview, TripType, User
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
@@ -11,13 +13,30 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.admin import UserAdmin
 
 
-
 admin.site.site_header = "Sayara Admin"
 admin.site.index_title = "Sayara Admin"
 admin.site.site_title = "Sayara Admin"
 
 admin.site.unregister(Site)
 # admin.site.unregister(EmailAddress)
+
+def export_as_csv(self, request, queryset):
+
+    meta = self.model._meta
+    field_names = [field.name for field in meta.fields]
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+    writer = csv.writer(response)
+
+    writer.writerow(field_names)
+    for obj in queryset:
+        writer.writerow([getattr(obj, field) for field in field_names])
+
+    return response
+
+export_as_csv.short_description = "Export Selected as CSV"
+
 
 
 @ admin.register(User)
@@ -43,6 +62,7 @@ class UserAdmin(UserAdmin):
     list_filter = ('phone_number', 'gender')
     search_fields = ('phone_number', 'birth_date__date', 'gender', 'total_trips', 'is_active', 'registered_at',)
     list_editable = ('is_active',)
+    actions = [export_as_csv]
     ordering = ['phone_number', ]
 
     def total_trips(self, obj):
@@ -57,17 +77,20 @@ class CarTypeAdmin(admin.ModelAdmin):
     list_display = ('type', 'trip_type',)
     list_filter = ('trip_type',)
     search_fields = ('type', 'trip_type',)
+    actions = [export_as_csv]
 
 
 @ admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('name', )
     search_fields = ('name',)
+    actions = [export_as_csv]
 
 
 @ admin.register(TripType)
 class TripTypeAdmin(admin.ModelAdmin):
     list_display = ('type',)
+    actions = [export_as_csv]
 
 # @ admin.register(StopPoint)
 # class StopPointAdmin(admin.ModelAdmin):
@@ -83,6 +106,7 @@ class TripAdmin(admin.ModelAdmin):
     list_filter = ('user__phone_number', 'status',)
     search_fields = ("user__phone_number", 'status', 'driver__phone_number', 'driver__first_name', 'distance', 'price', 'user__first_name')
     autocomplete_fields = ['driver', 'user',]
+    actions = [export_as_csv]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -104,6 +128,7 @@ class DriverLocationAdmin(admin.ModelAdmin):
     list_filter = ('user__phone_number',)
     search_fields = ("user__phone_number", "user__first_name")
     autocomplete_fields = ['user', ]
+    actions = [export_as_csv]
 
 
 # class DriverForm(forms.ModelForm):
@@ -122,6 +147,7 @@ class DriverAdmin(admin.ModelAdmin):
     list_editable = ('active', )
     autocomplete_fields = ['user', ]
     readonly_fields = ('image_photo', 'image_license_image_front', 'image_license_image_front', )
+    actions = [export_as_csv]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -198,6 +224,7 @@ class MessageAdmin(admin.ModelAdmin):
     search_fields = ("user__phone_number", 'user__first_name', 'status', 'created_at',)
     autocomplete_fields = ['user', ]
     readonly_fields = ('image_img', )
+    actions = [export_as_csv]
 
     def image_img(self, obj):
         return obj.image_img
@@ -209,6 +236,7 @@ class MessageAdmin(admin.ModelAdmin):
 class PriceAdmin(admin.ModelAdmin):
     list_display = ('km_price', 'wait_price', 'tax_price', 'extra_price', 'company_per',)
     search_fields = ('km_price', 'wait_price', 'tax_price', 'extra_price', 'company_per',)
+    actions = [export_as_csv]
 
     def has_add_permission(self, request) -> bool:
         return False
@@ -222,6 +250,7 @@ class CouponAdmin(admin.ModelAdmin):
     list_display = ('value', 'coupon', 'start_date', 'end_date', 'active', 'status', 'created_at',)
     list_filter = ('value', 'active')
     search_fields = ('value', 'coupon', 'start_date__date', 'end_date__date', 'active', 'status', 'created_at',)
+    actions = [export_as_csv]
 
 
 
@@ -230,6 +259,7 @@ class DriverReviewAdmin(admin.ModelAdmin):
     list_display = ('user_id', 'driver_id', 'review', )
     search_fields = ("user_id__phone_number", 'driver_id__phone_number', 'review', 'user_id__first_name', 'driver_id__first_name',)
     autocomplete_fields = ['driver_id', 'user_id',]
+    actions = [export_as_csv]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -247,6 +277,7 @@ class TripReviewAdmin(admin.ModelAdmin):
     list_display = ('user_id', 'trip', 'review', )
     search_fields = ("user_id__phone_number", 'user_id__first_name', 'trip', 'review',)
     autocomplete_fields = ['user_id', ]
+    actions = [export_as_csv]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -265,6 +296,7 @@ class ComplainAdmin(admin.ModelAdmin):
     search_fields = ("user__phone_number", 'user__first_name', 'phone', 'reason',)
     autocomplete_fields = ['user', ]
     readonly_fields = ('image_img', )
+    actions = [export_as_csv]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -296,6 +328,7 @@ class DriverbalanceAdmin(admin.ModelAdmin):
     list_display = ('driver', 'balance', 'activate', )
     search_fields = ("driver__phone_number", 'driver__first_name', 'activate', 'balance',)
     autocomplete_fields = ['driver', ]
+    actions = [export_as_csv]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -310,6 +343,7 @@ class AccountActivationAdmin(admin.ModelAdmin):
     list_display = ('user', 'status', 'otp', )
     search_fields = ("user__phone_number", 'user__first_name', 'status', 'otp',)
     autocomplete_fields = ['user', ]
+    actions = [export_as_csv]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -323,6 +357,7 @@ class AccountActivationAdmin(admin.ModelAdmin):
 class ExtraForCarAdmin(admin.ModelAdmin):
     list_display = ('extra', 'extra_arabic', 'active', )
     search_fields = ('extra', 'extra_arabic', 'active',)
+    actions = [export_as_csv]
 
 
 # Register your models here.

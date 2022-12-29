@@ -115,6 +115,12 @@ class TripView(APIView):
         serializer = TripSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            try:
+                get_driver = User.objects.get(id=request.data.get('driver', None)).firebase_token
+                if request.data.get('status') == 'new':
+                    send_notify(get_driver, 'New order', serializer.data)
+            except:
+                pass
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -125,6 +131,11 @@ class TripView(APIView):
             get_driver = Trip.objects.filter(id=get_trip_id)
             if get_driver.exists():
                 get_driver.update(**trip_data)
+                try:
+                    get_user = User.objects.get(id=request.data.get('user', None)).firebase_token
+                    send_notify(get_user, 'new trip status', trip_data)
+                except:
+                    pass
                 return Response({'data updated'}, status=status.HTTP_202_ACCEPTED)
             return Response({'No data'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'error'})

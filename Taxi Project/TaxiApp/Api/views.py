@@ -316,6 +316,17 @@ class PlacesView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, *args, **kwargs):
+        get_type = request.query_params.get('all', False)
+        get_place_id = request.query.params.get('place_id', None)
+        if get_type:
+            Places.objects.filter(user=request.user).delete()
+            return Response({'status':True}, status=status.HTTP_202_ACCEPTED)
+        elif get_place_id:
+            Places.objects.filter(user=request.user, id=get_place_id).delete()
+            return Response({'status':True}, status=status.HTTP_202_ACCEPTED)
+        return Response({'status':False}, status=status.HTTP_200_OK)
+
 
 class DriverbalanceView(APIView):
     permission_classes = [IsAuthenticated]

@@ -95,3 +95,53 @@ class TrackingDriverCounsumer(AsyncWebsocketConsumer):
             'lat': lat,
             'lng': lng
         }))
+
+
+class DriverCounsumer(AsyncWebsocketConsumer):
+    # opening connection
+    async def connect(self):
+        driver = self.scope['url_route']['kwargs']['room_name']
+        self.room_name = '{}'.format(driver)
+
+        self.room_group_name = self.room_name
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.accept()
+
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    async def receive(self, text_data=None):
+        driver = self.scope['url_route']['kwargs']['room_name']
+        text_data_json = json.loads(text_data)
+        lat = text_data_json['lat']
+        lng = text_data_json['lng']
+        status = text_data_json['status']
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'tracking',
+                'driver_id': driver,
+                'lat': lat,
+                'lng': lng,
+                'status': status
+            }
+        )
+
+    async def tracking(self, event):
+        user = event['driver_id']
+        lat = event['lat']
+        lng = event['lng']
+        status = event['status']
+
+        await self.send(text_data=json.dumps({
+            'driver_id': user,
+            'lat': lat,
+            'lng': lng,
+            'status':status
+        }))

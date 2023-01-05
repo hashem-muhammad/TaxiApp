@@ -119,6 +119,7 @@ class DriverCounsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None):
         driver = self.scope['url_route']['kwargs']['room_name']
         text_data_json = json.loads(text_data)
+        id_key = text_data_json['id_key']
         start_place = text_data_json['start_place']
         source = text_data_json['source']
         destination = text_data_json['destination']
@@ -135,6 +136,7 @@ class DriverCounsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             self.room_group_name,
             {
+                'id_key':id_key,
                 'type': 'tracking',
                 'driver_id': driver,
                 'start_place': start_place,
@@ -154,6 +156,7 @@ class DriverCounsumer(AsyncWebsocketConsumer):
         )
 
     async def tracking(self, event):
+        id_key = event['id_key']
         driver = event['driver_id']
         start_place = event['start_place']
         source = event['source']
@@ -169,8 +172,10 @@ class DriverCounsumer(AsyncWebsocketConsumer):
         trip_type = event['trip_type']
         price_after_coupon = event['price_after_coupon']
         trip_cancellation = event['trip_cancellation']
+        expected_time = event['expected_time']
 
         await self.send(text_data=json.dumps({
+            'id':id_key,
             'driver_id': driver,
             'start_place': start_place,
             'source': source,
@@ -185,5 +190,6 @@ class DriverCounsumer(AsyncWebsocketConsumer):
             'price':price,
             'trip_type': trip_type,
             'price_after_coupon':price_after_coupon,
-            'trip_cancellation':trip_cancellation
+            'trip_cancellation':trip_cancellation,
+            'expected_time':expected_time
         }))

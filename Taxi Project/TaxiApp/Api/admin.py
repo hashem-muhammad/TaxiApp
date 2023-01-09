@@ -78,7 +78,7 @@ class UserAdmin(UserAdmin):
         ('Personal info', {'fields': ('first_name', 'last_name', 'birth_date',)}),
         ('Permissions', {
          'fields': ('is_active', 'is_staff', 'role', 'groups',)}),
-        ('Others', {'fields': ('registered_at', 'gender',)}),
+        ('Others', {'fields': ('gender',)}),
     )
 
     add_fieldsets = (
@@ -91,7 +91,7 @@ class UserAdmin(UserAdmin):
 
     list_display = ('phone_number', 'birth_date', 'gender', 'total_trips', 'is_active', 'registered_at',)
     list_filter = ('phone_number', 'gender')
-    search_fields = ('phone_number', 'birth_date__date', 'gender', 'total_trips', 'is_active', 'registered_at',)
+    search_fields = ('phone_number', 'birth_date', 'gender', 'is_active', 'registered_at',)
     list_editable = ('is_active',)
     actions = [export_as_csv, export_as_pdf]
     ordering = ['phone_number', ]
@@ -132,7 +132,7 @@ class CarTypeAdmin(admin.ModelAdmin):
 
     list_display = ('type', 'trip_type',)
     list_filter = ('trip_type',)
-    search_fields = ('type', 'trip_type',)
+    search_fields = ('type',)
     actions = [export_as_csv, export_as_pdf]
 
 
@@ -189,7 +189,7 @@ class TripTypeAdmin(admin.ModelAdmin):
 
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename='report.pdf')
-    list_display = ('type',)
+    list_display = ('type', 'price')
     actions = [export_as_csv, export_as_pdf]
 
 # @ admin.register(StopPoint)
@@ -340,7 +340,7 @@ class DriverAdmin(admin.ModelAdmin):
 
     list_display = ('user', 'driver_name', 'car_model','car_color','plate_number', 'license_number', 'available', 'active', "driver_balance", "registered_at", "total_distance", "total_trips", "total_balance", "driver_review",)
     list_filter = ('user__phone_number', 'active',)
-    search_fields = ("user__phone_number", 'car_model', 'car_color', 'active', 'total_trips', 'available', 'license_number', 'plate_number', 'user__first_name',)
+    search_fields = ("user__phone_number", 'car_model', 'car_color', 'active', 'available', 'license_number', 'plate_number', 'user__first_name',)
     list_editable = ('active', )
     autocomplete_fields = ['user', ]
     readonly_fields = ('image_photo', 'image_license_image_front', 'image_license_image_front', )
@@ -611,7 +611,7 @@ class TripReviewAdmin(admin.ModelAdmin):
 
 
     list_display = ('user_id', 'trip', 'review', )
-    search_fields = ("user_id__phone_number", 'user_id__first_name', 'trip', 'review',)
+    search_fields = ("user_id__phone_number", 'user_id__first_name', 'review',)
     autocomplete_fields = ['user_id', ]
     actions = [export_as_csv, export_as_pdf]
 

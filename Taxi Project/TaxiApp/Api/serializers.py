@@ -73,7 +73,7 @@ class TripTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TripType
-        fields = ['id', 'type', 'arabic_type',]
+        fields = ['id', 'type', 'arabic_type', 'price',]
 
 
 class CarTypeSerializer(serializers.ModelSerializer):
